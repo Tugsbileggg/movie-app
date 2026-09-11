@@ -1,0 +1,128 @@
+"use client";
+
+import Image  from "next/image";
+
+import { Card, CardContent } from "./ui/card";
+import { Star } from "lucide-react";
+import { useState, useEffect } from "react";
+import axios from "axios";
+import { ArrowRight } from "lucide-react";
+import { useRouter } from "next/navigation";
+
+interface MoviecardProps {
+  adult: boolean;
+  backdrop_path: string;
+
+  genre_ids: number[];
+  id: number;
+  original_language: string;
+  original_title: string;
+  overview: string;
+  popularity: number;
+  poster_path: string;
+  release_date: number;
+  softcore: boolean;
+  title: string;
+  video: boolean;
+  vote_average: number;
+  vote_count: number;
+}
+
+const TopRated = () => {
+  const router = useRouter();
+  const [movies, setMovies] = useState<MoviecardProps[]>([]);
+
+  useEffect(() => {
+    axios
+      .get(
+        "https://api.themoviedb.org/3/movie/top_rated?language=en-US&page=1",
+        {
+          headers: {
+            Authorization: `Bearer ${process.env.NEXT_PUBLIC_TMDB_TOKEN}`,
+          },
+        },
+      )
+      .then((response) => {
+        console.log("working...");
+        console.log(response);
+        setMovies(response.data.results);
+      });
+  }, []);
+  return (
+    <div>
+      <div className="flex max-w-[1440px] w-full  justify-between items-center py-8  ">
+        <p className="flex justify-start w-[120px] h-[36px] items-center text-2xl font-bold">
+          TopRated
+        </p>
+        <button
+          onClick={() => router.push("/SeeMore/top_rated")}
+          className="flex justify-center cursor-pointer w-[120px] h-[36px] gap-2 items-center"
+        >
+          See more
+          <ArrowRight size={16} />
+        </button>
+      </div>
+      <div className="flex flex-wrap   justify-center gap-8">
+        {movies.length > 0 &&
+          movies.map((movie) => {
+            return (
+              <Card key={movie.id} className="w-[230px]  object-hidden  ">
+                <CardContent className="p-0">
+                  <div className="relative w-full h-[340px]">
+                    <Image
+                      key={movie.id}
+                      src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
+                      alt={movie.title}
+                      fill
+                      sizes="(max-width: 768px) 100vw, 230px"
+                      className="object-cover"
+                    />
+                  </div>
+
+                  <div className="flex flex-col text-sm py-2 px-3 bg-[#F4F4F5] ">
+                    <p className="flex gap-1 h-[23px] items-center">
+                      <Star fill="yellow" stroke="yellow" size={16} />
+                      <span className="text-black flex items-center gap-0.5 ">
+                        {movie.vote_average}
+                        <span className="text-gray-300 text-xs">/10</span>
+                      </span>
+                    </p>
+                    <span className="flex text-lg  items-start w-full h-[56px]">
+                      {movie.title}
+                    </span>
+                  </div>
+                </CardContent>
+              </Card>
+            );
+          })}
+      </div>
+    </div>
+  );
+};
+
+export default TopRated;
+
+// // import Image from "next/image";
+
+// // import { Card, CardContent } from "./ui/card";
+// // import { Star } from "lucide-react";
+
+// // const Moviecard = ({ rating, moviename, image }) => {
+// //   return (
+// //     <Card className=" w-[230px] ">
+// //       <CardContent className="flex flex-col ">
+// //         <Image src={image} alt="movie-image" width={230} height={340} />
+// //         <div className="flex flex-col  p-2 ">
+// //           <p className="flex gap-2">
+// //             <Star fill="yellow " stroke="yellow" />
+// //             <span>{rating}/10</span>
+// //           </p>
+// //           <span className=" flex items-center w-full h-[56px]">
+// //             {moviename}
+// //           </span>
+// //         </div>
+// //       </CardContent>
+// //     </Card>
+// //   );
+// // };
+// // export default Moviecard;
